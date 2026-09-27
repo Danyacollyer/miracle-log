@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Miracle Log</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4f2; --surface:#fbfaf8; --ink:#000; --body:#2d2a27; --muted:#6f6862;
+  --line:#e2ddd7; --copper:#a26a36; --copper-soft:#efe5d9; --on-copper:#fff;
+  --serif:"Bodoni Moda","Bodoni 72",Didot,"Playfair Display",Georgia,serif;
+  --sans:Lato,"Helvetica Neue",Helvetica,Arial,system-ui,sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#191715; --surface:#221f1c; --ink:#f6f2ed; --body:#ddd6ce; --muted:#a39a90;
+    --line:#38332e; --copper:#d9a06b; --copper-soft:#33281e; --on-copper:#191715;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#191715; --surface:#221f1c; --ink:#f6f2ed; --body:#ddd6ce; --muted:#a39a90;
+  --line:#38332e; --copper:#d9a06b; --copper-soft:#33281e; --on-copper:#191715;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--body);font:400 17px/1.65 var(--sans);-webkit-font-smoothing:antialiased}
+img{max-width:100%}
+.wrap{max-width:680px;margin:0 auto;padding:28px 22px 96px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--copper);outline-offset:3px;border-radius:6px}
+
+/* header */
+.top{display:flex;align-items:center;gap:14px}
+.mark{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-style:italic;font-size:19px;color:var(--ink);flex:none}
+.app-title{font-family:var(--serif);font-size:20px;color:var(--ink);line-height:1.2}
+.sub{font-size:14px;color:var(--muted)}
+.progress{height:2px;background:var(--line);margin-top:20px;border-radius:2px;overflow:hidden}
+.progress span{display:block;height:100%;background:var(--copper);transition:width .4s ease}
+.tabs{display:flex;gap:28px;border-bottom:1px solid var(--line);margin:8px 0 40px}
+.tab{background:none;border:0;padding:14px 0 12px;font-size:15px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-color:var(--copper)}
+
+/* type */
+.display{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--ink);line-height:1.02;letter-spacing:-.01em;margin:0}
+.day-title{font-size:clamp(42px,9.5vw,66px)}
+.week{color:var(--copper);font-size:15px;margin:0 0 10px}
+.lead{font-size:18px;margin:18px 0 0;max-width:60ch}
+.block{margin-top:44px}
+.block h3{font-family:var(--serif);font-weight:500;font-size:23px;color:var(--ink);margin:0 0 4px;line-height:1.25}
+.hint{color:var(--muted);font-size:15px;margin:0 0 14px}
+.prompt-line{font-family:var(--serif);font-style:italic;font-size:21px;color:var(--ink);margin:0 0 12px;line-height:1.35}
+
+/* fields */
+textarea,input[type="text"]{width:100%;font:inherit;font-size:17px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;resize:vertical}
+textarea{min-height:92px}
+textarea::placeholder,input::placeholder{color:var(--muted)}
+.add-row{display:flex;gap:10px;align-items:stretch}
+.add-row input{flex:1;min-width:0}
+
+/* declaration */
+.declaration{border-left:2px solid var(--copper);padding:4px 0 4px 22px}
+.declaration blockquote{margin:0;font-family:var(--serif);font-style:italic;font-size:clamp(22px,4.8vw,28px);line-height:1.35;color:var(--ink)}
+.declaration cite{display:block;margin-top:12px;font-style:normal;font-size:14px;color:var(--muted)}
+
+/* toggles & buttons */
+.check{display:inline-flex;align-items:center;gap:10px;margin-top:18px;background:none;border:1px solid var(--line);border-radius:999px;padding:9px 18px 9px 11px;font-size:15px;cursor:pointer}
+.check .box{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--muted);display:grid;place-items:center;flex:none}
+.check .box svg{width:12px;height:12px;opacity:0}
+.check[aria-pressed="true"]{border-color:var(--copper);color:var(--ink)}
+.check[aria-pressed="true"] .box{background:var(--copper);border-color:var(--copper)}
+.check[aria-pressed="true"] .box svg{opacity:1}
+.btn{font-weight:700;font-size:15px;border-radius:999px;padding:13px 22px;border:1px solid var(--ink);background:var(--ink);color:var(--bg);cursor:pointer;text-decoration:none;display:inline-block;text-align:center;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.copper{background:var(--copper);border-color:var(--copper);color:var(--on-copper)}
+.link{background:none;border:0;padding:0;color:var(--muted);font-size:15px;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.link:hover{color:var(--ink)}
+
+.challenge{background:var(--copper-soft);border-radius:18px;padding:22px 24px}
+.challenge h3{font-size:21px}
+.challenge p{margin:6px 0 0}
+
+.ev-list{list-style:none;padding:0;margin:16px 0 0}
+.ev-list li{display:flex;gap:14px;justify-content:space-between;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);color:var(--ink);font-family:var(--serif);font-size:19px;line-height:1.4}
+.ev-list li:first-child{border-top:1px solid var(--line)}
+.x{background:none;border:0;color:var(--muted);cursor:pointer;font-family:var(--sans);font-size:14px;padding:2px 4px;flex:none}
+.x:hover{color:var(--ink)}
+.nudge{color:var(--copper);font-size:15px;margin:14px 0 0}
+
+.lookback{border-top:1px solid var(--line);padding-top:36px}
+.lookback .count{font-family:var(--serif);font-style:italic;font-size:44px;color:var(--ink);line-height:1}
+.lookback ol{padding-left:0;list-style:none;margin:18px 0 0}
+.lookback ol li{padding:8px 0;font-family:var(--serif);font-size:18px;color:var(--ink);border-bottom:1px solid var(--line)}
+.lookback ol li span{font-family:var(--sans);font-size:13px;color:var(--muted);margin-right:10px}
+.q{margin-top:26px}
+.q label{display:block;font-family:var(--serif);font-size:20px;color:var(--ink);margin-bottom:10px;line-height:1.35}
+
+.footer-actions{margin-top:52px;padding-top:28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center}
+.daynav{display:flex;gap:18px}
+.pill{display:inline-flex;align-items:center;gap:8px;color:var(--copper);font-size:15px;font-weight:700}
+
+/* evidence wall */
+.wall-head{margin-bottom:40px}
+.wall-count{font-family:var(--serif);font-style:italic;font-weight:400;font-size:clamp(96px,26vw,168px);line-height:.85;color:var(--ink);margin:0;letter-spacing:-.03em}
+.wall-caption{font-family:var(--serif);font-size:clamp(22px,4.6vw,28px);color:var(--ink);margin:14px 0 0;line-height:1.3;max-width:24ch}
+.wall{columns:2 230px;column-gap:16px}
+.note{break-inside:avoid;margin:0 0 16px;background:var(--surface);border:1px solid var(--line);border-radius:4px 18px 18px 18px;padding:18px 20px 16px}
+.note:nth-child(5n+2){background:var(--copper-soft);border-color:transparent}
+.note p{font-family:var(--serif);font-size:19px;line-height:1.4;color:var(--ink);margin:0}
+.note span{display:block;margin-top:10px;font-size:13px;color:var(--muted)}
+.empty{border:1px dashed var(--line);border-radius:18px;padding:36px 28px}
+.empty p{margin:0 0 18px}
+
+/* journey */
+.week-row{margin-bottom:28px}
+.week-row h3{font-family:var(--serif);font-weight:500;font-size:20px;color:var(--ink);margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.cell{aspect-ratio:1;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--serif);font-size:clamp(15px,3.6vw,20px);background:transparent;color:var(--ink);cursor:pointer;padding:0}
+.cell.done{background:var(--copper);color:var(--on-copper);border-color:var(--copper)}
+.cell.current{border:1.5px solid var(--ink)}
+.cell:disabled{color:var(--muted);opacity:.45;cursor:not-allowed}
+.settings{margin-top:48px;padding-top:28px;border-top:1px solid var(--line)}
+.settings p{margin:0 0 14px}
+.settings .row{display:flex;gap:22px;flex-wrap:wrap}
+
+/* setup */
+.setup-title{font-size:clamp(58px,15vw,108px);margin-top:40px}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+.chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:10px 18px;font-size:16px;cursor:pointer;color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.other{margin-top:14px}
+
+/* finish */
+.finish{margin-top:52px;background:var(--copper-soft);border-radius:24px;padding:36px 28px}
+.finish .display{font-size:clamp(46px,11vw,72px)}
+.finish p{margin:16px 0 0;max-width:52ch}
+.finish .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);background:var(--ink);color:var(--bg);padding:12px 20px;border-radius:999px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:10;max-width:calc(100% - 40px);text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+@media (max-width:480px){
+  .wrap{padding:22px 18px 88px}
+  .add-row{flex-direction:column}
+  .tabs{gap:22px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* ---------- Edit these links ---------- */
+const CONFIG = {
+  nextLevelThoughtsUrl: "https://nextlevelthoughts.danyacollyer.com/",
+  instagramUrl: "https://instagram.com/danyacollyer",
+  storageKey: "miracle-log-v1"
+};
+
+const WEEKS = ["Open your eyes", "Look closer", "Expect it"];
+
+const DAYS = [
+  { t:"Tell your brain what matters",
+    f:"Your RAS is already filtering today. This morning, you get to hand it a new assignment: look for God.",
+    d:"God, I'm training my eyes to see You moving in my life today. You are working all things together for my good.", r:"Romans 8:28",
+    c:"Before noon, name one thing you'd normally rush past without noticing." },
+  { t:"Small is not insignificant",
+    f:"You're not hunting for fireworks. The small things count, and they're usually where God is hiding in plain sight.",
+    d:"I will not despise small beginnings. Every small sign of Your hand is worth noticing.", r:"Zechariah 4:10",
+    c:"Find three small things today. A text, a green light, a kind word. Write them all down tonight." },
+  { t:"New every morning",
+    f:"Yesterday doesn't get to decide what you see today. His mercy showed up fresh this morning. Go find it.",
+    d:"Your mercies are new this morning, and I will find them before this day is over.", r:"Lamentations 3:22–23" },
+  { t:"He already went ahead",
+    f:"Before you ever walked into today, He was already there. Watch for the places where the way was prepared.",
+    d:"You have already gone ahead of me into today. I'll look for the places You prepared the way.", r:"Deuteronomy 31:8",
+    c:"Notice one door that opened easier than you expected." },
+  { t:"Watch for provision",
+    f:"Provision isn't only money. It's resources, people, timing, and ideas. Widen the lens today.",
+    d:"You supply every need I have. I'm watching for Your provision today, in resources, in people, and in timing.", r:"Philippians 4:19" },
+  { t:"The people He sends",
+    f:"God so often moves through people. Pay attention to who shows up, and when.",
+    d:"You send the right people at the right time. I'll notice who You put in my path today.", r:"Ecclesiastes 4:9–10",
+    c:"Tell one person how they showed up for you recently." },
+  { t:"Look what you found", look:true,
+    f:"One week in. Before you add today's evidence, stop and look back at everything your eyes caught this week.",
+    d:"I will remember Your works and call to mind Your wonders.", r:"Psalm 77:11",
+    q:["What surprised you most this week?",
+       "Where did you see God move that you would have missed a week ago?",
+       "Where did your old thinking push back this week?"] },
+
+  { t:"Seek and you will find",
+    f:"This week you're going deeper. Not just noticing, but actively seeking. Scripture promises seekers find.",
+    d:"When I seek, I find. I'm seeking You in every part of today.", r:"Matthew 7:7" },
+  { t:"Answered prayers",
+    f:"Some answers don't look the way you pictured. Today, look for the ones that came in a different package.",
+    d:"You hear me when I pray. I'll look for Your answers today, even the ones that don't look like I expected.", r:"1 John 5:14–15",
+    c:"Look back at an old prayer request, note or journal entry. Has any of it been answered?" },
+  { t:"Peace in the pressure",
+    f:"Stress narrows your focus to the threat. That's your brain doing its job. Today you practice widening it again.",
+    d:"When my mind stays on You, You keep me in perfect peace. I'm fixing my focus on You.", r:"Isaiah 26:3",
+    c:"In your most stressful moment today, pause and name one thing that's going right." },
+  { t:"Trace it back",
+    f:"Every good thing has a source. Today, don't just notice the good. Trace it back to the Giver.",
+    d:"Every good and perfect gift comes from You. I'll trace today's good things back to You.", r:"James 1:17" },
+  { t:"Solutions are already there",
+    f:"Your brain finds what it's told to look for. Tell it to look for answers instead of rehearsing the problem.",
+    d:"You give wisdom generously to all who ask. I expect clear next steps and solutions today.", r:"James 1:5",
+    c:"Write down one problem this morning. By tonight, find one idea or next step you didn't have before." },
+  { t:"Look up",
+    f:"Beauty is evidence too. Creation has been declaring His glory the whole time.",
+    d:"The heavens declare Your glory. I'll notice Your beauty all around me today.", r:"Psalm 19:1",
+    c:"Step outside for five minutes. Put the phone away and look up." },
+  { t:"Great things", look:true,
+    f:"Two weeks. Look at how much you've gathered. This is what was there all along.",
+    d:"You have done great things for me, and I am filled with joy.", r:"Psalm 126:3",
+    q:["What patterns do you see in your evidence?",
+       "Which area has been hardest to see God in, and why do you think that is?",
+       "What thought keeps trying to tell you nothing has changed?"] },
+
+  { t:"Expect it",
+    f:"Week three is about expectation. You're not wondering if God will move today. You're watching for how.",
+    d:"I watch in hope for You. I expect to see You move today.", r:"Micah 7:7" },
+  { t:"Opportunities, not obstacles",
+    f:"The same situation can look like a wall or a doorway. What you look for decides which one you see.",
+    d:"You are doing a new thing. I'm looking for the way You are making in the wilderness.", r:"Isaiah 43:19",
+    c:"Take one obstacle and ask, \"What could this open up?\"" },
+  { t:"Guard your gaze",
+    f:"You'll catch yourself scanning for the negative today. That's not failure. That's awareness. Redirect and keep going.",
+    d:"I choose to think on whatever is true, noble, right, pure, lovely and admirable.", r:"Philippians 4:8",
+    c:"Catch one negative thought today, and replace it with a piece of evidence you've already found." },
+  { t:"Gratitude out loud",
+    f:"Gratitude is a lens. The more you use it, the clearer you see.",
+    d:"In every circumstance, I give thanks. Gratitude is how I see You clearly.", r:"1 Thessalonians 5:18",
+    c:"Thank God out loud for three specific things before you go to bed." },
+  { t:"Faithful in the details",
+    f:"He is faithful in the big things and the small ones. Look for His faithfulness in the ordinary parts of today.",
+    d:"You are faithful to every promise You've made. I'll see Your faithfulness in the details today.", r:"Hebrews 10:23" },
+  { t:"Share the evidence",
+    f:"Testimony isn't just for you. When you share what God did, it strengthens someone else's faith, and yours.",
+    d:"I overcome by the word of my testimony. I will tell what You have done.", r:"Revelation 12:11",
+    c:"Share one piece of your evidence with a friend, or on Instagram." },
+  { t:"This is how you see now", look:true,
+    f:"Twenty-one days. You trained your eyes to see Him, and they learned. Look back at where you started.",
+    d:"I am being transformed by the renewing of my mind. Seeing You move is becoming my new normal.", r:"Romans 12:2",
+    q:["How does this area of your life look different than it did 21 days ago?",
+       "What's the one piece of evidence you never want to forget?",
+       "Where do old beliefs still feel loud?"] }
+];
+
+const AREAS = ["my marriage","my finances","my friendships","my purpose & calling","my health","my family","my business"];
+
+/* ---------- state ---------- */
+const $app = document.getElementById("app");
+const $toast = document.getElementById("toast");
+let S = load() || fresh();
+let nudgeDay = null;
+
+function fresh(){ return { area:"", entries:{}, tab:"today", day:1, setup:true }; }
+function load(){ try{ const r = localStorage.getItem(CONFIG.storageKey); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+function save(){ try{ localStorage.setItem(CONFIG.storageKey, JSON.stringify(S)); }catch(e){} }
+function E(n){ if(!S.entries[n]) S.entries[n] = { expect:"", declared:false, challenge:false, evidence:[], reflect:["","",""], done:false }; return S.entries[n]; }
+function isDone(n){ return !!(S.entries[n] && S.entries[n].done); }
+function unlocked(n){ return n === 1 || isDone(n-1); }
+function current(){ for(let i=1;i<=21;i++){ if(!isDone(i)) return i; } return 21; }
+function doneCount(){ let c=0; for(let i=1;i<=21;i++) if(isDone(i)) c++; return c; }
+function allEvidence(from=1,to=21){
+  const out=[]; for(let i=from;i<=to;i++){ const e=S.entries[i]; if(e) e.evidence.forEach(v=>out.push({day:i,...v})); } return out;
+}
+function esc(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg){ $toast.textContent = msg; $toast.classList.add("show"); clearTimeout(toast.t); toast.t = setTimeout(()=>$toast.classList.remove("show"), 2400); }
+const CHECK = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 6.2l2.3 2.3 4.7-5" fill="none" stroke="var(--on-copper)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- views ---------- */
+function render(){
+  if(S.setup){ $app.innerHTML = setupView(); return; }
+  const pct = Math.round(doneCount()/21*100);
+  $app.innerHTML = `
+    <header class="top">
+      <div class="mark" aria-hidden="true">DC</div>
+      <div>
+        <div class="app-title">The Miracle Log</div>
+        <div class="sub">${doneCount()} of 21 days complete</div>
+      </div>
+    </header>
+    <div class="progress" aria-hidden="true"><span style="width:${pct}%"></span></div>
+    <nav class="tabs" role="tablist">
+      ${tab("today","Today")}${tab("wall","Evidence wall")}${tab("journey","21 days")}
+    </nav>
+    <main>${S.tab==="wall" ? wallView() : S.tab==="journey" ? journeyView() : dayView(S.day)}</main>`;
+}
+function tab(id,label){ return `<button class="tab" role="tab" aria-selected="${S.tab===id}" data-action="tab" data-tab="${id}">${label}</button>`; }
+
+function setupView(){
+  const returning = Object.keys(S.entries).length > 0;
+  const custom = S.area && !AREAS.includes(S.area);
+  return `
+    <header class="top"><div class="mark" aria-hidden="true">DC</div><div class="app-title">Danya Collyer</div></header>
+    <h1 class="display setup-title">The Miracle Log</h1>
+    <p class="lead">Twenty-one days of training your eyes to see God move. Two sentences a day, one declaration, and a growing wall of evidence that He's been there all along.</p>
+    <div class="block">
+      <h3>Where do you want to see God move?</h3>
+      <p class="hint">Pick the area you've been praying over. You can change it later.</p>
+      <div class="chips">
+        ${AREAS.map(a=>`<button class="chip" aria-pressed="${S.area===a}" data-action="pick-area" data-value="${esc(a)}">${esc(a.replace(/^my /,"").replace(/^./,c=>c.toUpperCase()))}</button>`).join("")}
+        <button class="chip" aria-pressed="${custom}" data-action="pick-other">Something else</button>
+      </div>
+      <div class="other" ${custom || S._other ? "" : "hidden"}>
+        <label class="sr" for="other-input">Your area</label>
+        <input type="text" id="other-input" placeholder="For example: my son's future" value="${custom ? esc(S.area) : ""}">
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="btn" data-action="start">${returning ? "Save focus area" : "Start day 1"}</button>
+      ${returning ? `<button class="link" data-action="cancel-setup">Cancel</button>` : ""}
+    </div>`;
+}
+
+function dayView(n){
+  const d = DAYS[n-1], e = E(n), w = Math.ceil(n/7);
+  const locked = !unlocked(n);
+  if(locked){
+    return `<p class="week">Week ${w}: ${WEEKS[w-1]}</p>
+      <h1 class="display day-title">Day ${n}</h1>
+      <p class="lead">This day opens once you finish day ${n-1}. One day at a time is how the new pathway gets built.</p>
+      <div class="footer-actions"><button class="btn" data-action="goto" data-day="${current()}">Go to day ${current()}</button></div>`;
+  }
+  const weekEv = d.look ? allEvidence(n-6, n) : [];
+  return `
+    <p class="week">Week ${w}: ${WEEKS[w-1]}</p>
+    <h1 class="display day-title">Day ${n}. ${esc(d.t)}</h1>
+    <p class="lead">${esc(d.f)}</p>
+
+    <section class="block">
+      <h3>This morning</h3>
+      <p class="hint">Before you look at your phone.</p>
+      <p class="prompt-line">Today I expect to see God move in the area of ${esc(S.area)}.</p>
+      <label class="sr" for="expect">What are you watching for today?</label>
+      <textarea id="expect" data-field="expect" placeholder="Get specific. What are you watching for today?">${esc(e.expect)}</textarea>
+    </section>
+
+    <section class="block declaration">
+      <blockquote>${esc(d.d)}</blockquote>
+      <cite>${esc(d.r)}</cite>
+      <button class="check" aria-pressed="${e.declared}" data-action="toggle" data-key="declared"><span class="box">${CHECK}</span>I said it out loud</button>
+    </section>
+
+    ${d.c ? `<section class="block challenge">
+      <h3>Today's noticing challenge</h3>
+      <p>${esc(d.c)}</p>
+      <button class="check" aria-pressed="${e.challenge}" data-action="toggle" data-key="challenge"><span class="box">${CHECK}</span>Done</button>
+    </section>` : ""}
+
+    <section class="block">
+      <h3>Tonight</h3>
+      <p class="hint">Before bed. Add each thing you noticed. Every one goes on your evidence wall.</p>
+      <p class="prompt-line">Today I noticed…</p>
+      <div class="add-row">
+        <label class="sr" for="ev-input">Something you noticed today</label>
+        <input type="text" id="ev-input" placeholder="A friend checked in right when I needed it">
+        <button class="btn ghost" data-action="add">Add evidence</button>
+      </div>
+      ${e.evidence.length ? `<ul class="ev-list">${e.evidence.map(v=>`<li><span>${esc(v.text)}</span><button class="x" data-action="remove" data-id="${v.id}" aria-label="Remove">Remove</button></li>`).join("")}</ul>` : ""}
+      ${nudgeDay===n ? `<p class="nudge">Add at least one thing you noticed today before you close out the day.</p>` : ""}
+    </section>
+
+    ${d.look ? `<section class="block lookback">
+      <h3>Look back at this week</h3>
+      <p class="hint">Read every piece out loud if you can.</p>
+      <div class="count">${weekEv.length} ${weekEv.length===1?"piece":"pieces"} of evidence</div>
+      ${weekEv.length ? `<ol>${weekEv.map(v=>`<li><span>Day ${v.day}</span>${esc(v.text)}</li>`).join("")}</ol>` : ""}
+      ${d.q.map((q,i)=>`<div class="q"><label for="rq${i}">${esc(q)}</label><textarea id="rq${i}" data-field="reflect-${i}">${esc(e.reflect[i]||"")}</textarea></div>`).join("")}
+    </section>` : ""}
+
+    <div class="footer-actions">
+      ${e.done
+        ? `<span class="pill">${CHECK.replace('var(--on-copper)','var(--copper)')} Day ${n} complete</span>
+           ${n<21 ? `<button class="btn" data-action="goto" data-day="${n+1}">Go to day ${n+1}</button>` : ""}`
+        : `<button class="btn" data-action="complete">Complete day ${n}</button>`}
+      <div class="daynav">
+        ${n>1 ? `<button class="link" data-action="goto" data-day="${n-1}">Previous day</button>` : ""}
+        ${n<21 && unlocked(n+1) && !e.done ? `<button class="link" data-action="goto" data-day="${n+1}">Next day</button>` : ""}
+      </div>
+    </div>
+    ${n===21 && e.done ? finishView() : ""}`;
+}
+
+function finishView(){
+  const total = allEvidence().length;
+  return `<section class="finish">
+    <h2 class="display">You did it.</h2>
+    <p>Twenty-one days. ${total} ${total===1?"piece":"pieces"} of evidence that God is moving in ${esc(S.area)}. None of it was new. You just trained your eyes to see it.</p>
+    <p>Seeing differently is the first shift. Next Level Thoughts shows you how to uproot the old beliefs that still get loud and build a way of thinking that holds, so this becomes how you live, not something you have to fight for every day.</p>
+    <div class="row">
+      <a class="btn" href="${CONFIG.nextLevelThoughtsUrl}" target="_blank" rel="noopener">Get Next Level Thoughts</a>
+      <a class="btn ghost" href="${CONFIG.instagramUrl}" target="_blank" rel="noopener">Share your wins on Instagram</a>
+    </div>
+  </section>`;
+}
+
+function wallView(){
+  const ev = allEvidence().reverse();
+  if(!ev.length){
+    return `<div class="empty">
+      <p class="display" style="font-size:34px;margin-bottom:12px">Your wall is waiting.</p>
+      <p>Everything you notice goes here. Add your first piece of evidence from tonight's prompt.</p>
+      <button class="btn" data-action="goto" data-day="${current()}">Go to day ${current()}</button>
+    </div>`;
+  }
+  return `<div class="wall-head">
+      <p class="wall-count">${ev.length}</p>
+      <p class="wall-caption">${ev.length===1?"piece":"pieces"} of evidence that God is moving in ${esc(S.area)}.</p>
+    </div>
+    <div class="wall">${ev.map(v=>`<article class="note"><p>${esc(v.text)}</p><span>Day ${v.day}</span></article>`).join("")}</div>`;
+}
+
+function journeyView(){
+  const cur = current();
+  let html = "";
+  for(let w=1; w<=3; w++){
+    html += `<div class="week-row"><h3>Week ${w}: ${WEEKS[w-1]}</h3><div class="grid">`;
+    for(let n=(w-1)*7+1; n<=w*7; n++){
+      const cls = isDone(n) ? "done" : (n===cur ? "current" : "");
+      html += `<button class="cell ${cls}" data-action="goto" data-day="${n}" ${unlocked(n)?"":"disabled"} aria-label="Day ${n}${isDone(n)?", complete":""}">${n}</button>`;
+    }
+    html += `</div></div>`;
+  }
+  html += `<section class="settings">
+    <p>You're looking for God to move in <strong>${esc(S.area)}</strong>.</p>
+    <div class="row">
+      <button class="link" data-action="change-area">Change focus area</button>
+      <button class="link" data-action="reset">Start over</button>
+    </div>
+  </section>`;
+  return html;
+}
+
+/* ---------- actions ---------- */
+function goto(n){ S.day = n; S.tab = "today"; nudgeDay = null; save(); render(); window.scrollTo(0,0); }
+
+$app.addEventListener("click", ev=>{
+  const b = ev.target.closest("[data-action]"); if(!b) return;
+  const a = b.dataset.action;
+  if(a==="pick-area"){ S.area = b.dataset.value; S._other = false; render(); }
+  else if(a==="pick-other"){ S._other = true; if(AREAS.includes(S.area)) S.area=""; render(); const i=document.getElementById("other-input"); i && i.focus(); }
+  else if(a==="start"){
+    const i = document.getElementById("other-input");
+    if(S._other && i) S.area = i.value.trim();
+    if(!S.area){ toast("Pick an area to focus on first"); return; }
+    S.setup = false; delete S._other; S.day = current(); S.tab = "today"; save(); render(); window.scrollTo(0,0);
+  }
+  else if(a==="cancel-setup"){ S.setup=false; delete S._other; render(); }
+  else if(a==="tab"){ S.tab = b.dataset.tab; if(S.tab==="today" && !unlocked(S.day)) S.day=current(); save(); render(); }
+  else if(a==="goto"){ goto(+b.dataset.day); }
+  else if(a==="toggle"){ const e=E(S.day); e[b.dataset.key]=!e[b.dataset.key]; save(); b.setAttribute("aria-pressed", e[b.dataset.key]); }
+  else if(a==="add"){ addEvidence(); }
+  else if(a==="remove"){ const e=E(S.day); e.evidence = e.evidence.filter(v=>v.id!==b.dataset.id); save(); render(); }
+  else if(a==="complete"){
+    const e = E(S.day);
+    if(!e.evidence.length){ nudgeDay = S.day; render(); document.getElementById("ev-input").focus(); return; }
+    e.done = true; nudgeDay = null; save();
+    if(S.day < 21){ toast(`Day ${S.day} complete. See you tomorrow.`); goto(S.day+1); }
+    else { render(); const f=document.querySelector(".finish"); f && f.scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto":"smooth"}); }
+  }
+  else if(a==="change-area"){ S.setup = true; S._other = !AREAS.includes(S.area); render(); window.scrollTo(0,0); }
+  else if(a==="reset"){ if(confirm("Start over? This clears all 21 days and your evidence wall.")){ S = fresh(); save(); render(); } }
+});
+
+function addEvidence(){
+  const i = document.getElementById("ev-input"); if(!i) return;
+  const text = i.value.trim(); if(!text){ i.focus(); return; }
+  E(S.day).evidence.push({ id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), text });
+  if(nudgeDay===S.day) nudgeDay=null;
+  save(); render();
+  const n = document.getElementById("ev-input"); n && n.focus();
+  toast("Added to your evidence wall");
+}
+
+$app.addEventListener("keydown", ev=>{
+  if(ev.target.id==="ev-input" && ev.key==="Enter"){ ev.preventDefault(); addEvidence(); }
+  if(ev.target.id==="other-input" && ev.key==="Enter"){ ev.preventDefault(); document.querySelector('[data-action="start"]').click(); }
+});
+
+$app.addEventListener("input", ev=>{
+  const f = ev.target.dataset.field; if(!f) return;
+  const e = E(S.day);
+  if(f==="expect") e.expect = ev.target.value;
+  else if(f.startsWith("reflect-")){ e.reflect[+f.split("-")[1]] = ev.target.value; }
+  clearTimeout(save.t); save.t = setTimeout(save, 300);
+});
+
+render();
+</script>
+</body>
+</html>
